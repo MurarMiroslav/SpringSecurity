@@ -1,5 +1,6 @@
 package guru.sfg.brewery.web.controllers;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.anonymous;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
@@ -13,7 +14,10 @@ import guru.sfg.brewery.repositories.CustomerRepository;
 import guru.sfg.brewery.services.BeerService;
 import guru.sfg.brewery.services.BreweryService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -63,7 +67,7 @@ public class BeerControllerIT {
 				.andExpect(view().name("beers/findBeers"));
 	}
 
-	@WithMockUser("miro")
+//	@WithMockUser("miro")		//Nie je nutne ak mame .with(httpBasic(...)
 	@Test
 	void findBeers2() throws Exception {
 //		mockMvc.perform(get("/beers/find").with(httpBasic("miroo", "murar")))		//S tymto to uz neprejde
@@ -71,5 +75,39 @@ public class BeerControllerIT {
 				.andExpect(status().isOk())
 				.andExpect(model().attributeExists("beer"))
 				.andExpect(view().name("beers/findBeers"));
+	}
+
+	@Test
+	void indexTest() throws Exception {
+		mockMvc.perform(get("/"))
+				.andExpect(status().isOk());
+	}
+
+	@WithMockUser("miro")
+	@Test
+	void findBeers3() throws Exception {
+		mockMvc.perform(get("/beers/find").with(anonymous()))
+				.andExpect(status().isOk())
+				.andExpect(model().attributeExists("beer"))
+				.andExpect(view().name("beers/findBeers"));
+	}
+
+	@Nested
+	class BeerRestControllerTest {
+		@Test
+		void findBeers() throws Exception{
+			mockMvc.perform(get("/api/v1/beer/"))
+					.andExpect(status().isOk());
+		}
+
+		@Test
+		void findBeerById() throws Exception{
+//			mockMvc.perform(get("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c311"))
+//			mockMvc.perform(get("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c399"))
+//			mockMvc.perform(get("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c152"))						//Vsetky vyssie prejdu
+//			mockMvc.perform(get("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c152XXXXXXXXXXXXXXXXXXXXXX"))	//Tento eprejde nejako to vie ze to uz nesedi s UUID. Ocividne tento test neriesi ci to existuje ale ci nam nehodi FORBIDEN
+			mockMvc.perform(get("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c152"))
+					.andExpect(status().isOk());
+		}
 	}
 }
