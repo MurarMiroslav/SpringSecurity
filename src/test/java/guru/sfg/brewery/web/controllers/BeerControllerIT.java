@@ -57,7 +57,6 @@ public class BeerControllerIT {
 				.build();
 	}
 
-//	@WithMockUser("miroooo")	//Prejde to aj s tymto
 	@WithMockUser("miro")
 	@Test
 	void findBeers() throws Exception {
@@ -67,7 +66,6 @@ public class BeerControllerIT {
 				.andExpect(view().name("beers/findBeers"));
 	}
 
-//	@WithMockUser("miro")		//Nie je nutne ak mame .with(httpBasic(...)
 	@Test
 	void findBeers2() throws Exception {
 //		mockMvc.perform(get("/beers/find").with(httpBasic("miroo", "murar")))		//S tymto to uz neprejde
@@ -92,6 +90,7 @@ public class BeerControllerIT {
 				.andExpect(view().name("beers/findBeers"));
 	}
 
+
 	@Nested
 	class BeerRestControllerTest {
 		@Test
@@ -102,12 +101,17 @@ public class BeerControllerIT {
 
 		@Test
 		void findBeerById() throws Exception{
-//			mockMvc.perform(get("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c311"))
-//			mockMvc.perform(get("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c399"))
-//			mockMvc.perform(get("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c152"))						//Vsetky vyssie prejdu
-//			mockMvc.perform(get("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c152XXXXXXXXXXXXXXXXXXXXXX"))	//Tento eprejde nejako to vie ze to uz nesedi s UUID. Ocividne tento test neriesi ci to existuje ale ci nam nehodi FORBIDEN
 			mockMvc.perform(get("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c152"))
 					.andExpect(status().isOk());
 		}
+	}
+
+
+	@Test
+	void initCreationForm() throws Exception {
+		mockMvc.perform(get("/beers/new").with(httpBasic("michal", "kurbel")))
+				.andExpect(status().isOk())
+				.andExpect(model().attributeExists("beer"))
+				.andExpect(view().name("beers/createBeer"));
 	}
 }
