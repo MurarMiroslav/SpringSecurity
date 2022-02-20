@@ -50,23 +50,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.password("{noop}kurbel")
 //				.password("{sha256}3fc951541d0d2e460b9a2f4df43a33b4e2c9a1bc4795c3cdfb1b1dbc1a47facd")  //nechapem preco nefunguje mozno preto ze to je deprecated
 				.roles("USER");
-	}
 
-//	@Override
-//	@Bean
-//	protected UserDetailsService userDetailsService() {
-//
-//		UserDetails miro = User.withDefaultPasswordEncoder()
-//				.username("miro")
-//				.password("murar")
-//				.roles("ADMIN")
-//				.build();
-//		UserDetails michal = User.withDefaultPasswordEncoder()
-//				.username("michal")
-//				.password("kurbel")
-//				.roles("USER")
-//				.build();
-//
-//		return new InMemoryUserDetailsManager(miro, michal);
-//	}
+	}
 }
