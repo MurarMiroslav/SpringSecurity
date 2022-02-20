@@ -15,17 +15,19 @@ import guru.sfg.brewery.repositories.CustomerRepository;
 import guru.sfg.brewery.services.BeerService;
 import guru.sfg.brewery.services.BreweryService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
-@WebMvcTest
+@SpringBootTest
 public class BeerControllerIT {
 
 	@Autowired
@@ -67,7 +69,6 @@ public class BeerControllerIT {
 
 	@Test
 	void findBeers2() throws Exception {
-//		mockMvc.perform(get("/beers/find").with(httpBasic("miroo", "murar")))		//S tymto to uz neprejde
 		mockMvc.perform(get("/beers/find").with(httpBasic("miro", "murar")))
 				.andExpect(status().isOk())
 				.andExpect(model().attributeExists("beer"))
@@ -106,6 +107,7 @@ public class BeerControllerIT {
 		}
 
 		@Test
+		@Disabled
 		void deleteBeer() throws Exception {
 			mockMvc.perform(delete("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c311")
 							.header("Api-Key", "miro").header("Api-Secret", "murar"))
@@ -120,5 +122,40 @@ public class BeerControllerIT {
 				.andExpect(status().isOk())
 				.andExpect(model().attributeExists("beer"))
 				.andExpect(view().name("beers/createBeer"));
+	}
+
+	@Nested
+	class BeerRestControllerIT {
+
+		@Test
+		void deleteBeerHttpBasic() throws Exception{
+			mockMvc.perform(delete("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c311")
+							.with(httpBasic("miro", "murar")))
+					.andExpect(status().is2xxSuccessful());
+		}
+
+		@Test
+		void deleteBeerNoAuth() throws Exception{
+			mockMvc.perform(delete("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c311"))
+					.andExpect(status().isUnauthorized());
+		}
+
+		@Test
+		void findBeers() throws Exception{
+			mockMvc.perform(get("/api/v1/beer/"))
+					.andExpect(status().isOk());
+		}
+
+		@Test
+		void findBeerById() throws Exception{
+			mockMvc.perform(get("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c311"))
+					.andExpect(status().isOk());
+		}
+
+		@Test
+		void findBeerByUpc() throws Exception{
+			mockMvc.perform(get("/api/v1/beerUpc/0631234200036"))
+					.andExpect(status().isOk());
+		}
 	}
 }
