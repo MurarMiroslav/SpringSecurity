@@ -1,37 +1,56 @@
 package guru.sfg.brewery.config;
 
+import guru.sfg.brewery.security.RestHeaderAuthFilter;
+import guru.sfg.brewery.security.RestUrlAuthFilter;
 import guru.sfg.brewery.security.SfgPasswordEncoderFactories;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
+	public RestHeaderAuthFilter restHeaderAuthFilter(AuthenticationManager authenticationManager) {
+		RestHeaderAuthFilter filter = new RestHeaderAuthFilter(new AntPathRequestMatcher("/api/**"));
+		filter.setAuthenticationManager(authenticationManager);
+		return filter;
+	}
+
+	public RestUrlAuthFilter restUrlAuthFilter(AuthenticationManager authenticationManager) {
+		RestUrlAuthFilter filter = new RestUrlAuthFilter(new AntPathRequestMatcher("/api/**"));
+		filter.setAuthenticationManager(authenticationManager);
+		return filter;
+	}
+
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		http
-				.authorizeRequests(authorize -> {
+		http.addFilterBefore(restHeaderAuthFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class).csrf().disable();
+
+		http.addFilterBefore(restUrlAuthFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class);
+
+		http.authorizeRequests(authorize -> {
 					authorize.antMatchers("/", "webjars/**", "/login", "/resources/**").permitAll();
 					authorize.antMatchers("/beers/find").permitAll();
 					authorize.antMatchers(HttpMethod.GET, "/api/v1/**").permitAll();
+//					authorize.antMatchers(HttpMethod.DELETE, "/api/v1/**").permitAll();		//Ak vypnes filtre a chces aby testy presli odkomentuj
 				})
 				.authorizeRequests().anyRequest().authenticated()
 				.and()
 				.formLogin()
 				.and()
-				.httpBasic();
+				.httpBasic()
+
+//				.and().csrf().disable().cors()			//Ak vypnes filtre a chces aby testy presli odkomentuj
+				;
 	}
 
 	@Bean
@@ -48,8 +67,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.and()
 				.withUser("michal")
 				.password("{noop}kurbel")
-//				.password("{sha256}3fc951541d0d2e460b9a2f4df43a33b4e2c9a1bc4795c3cdfb1b1dbc1a47facd")  //nechapem preco nefunguje mozno preto ze to je deprecated
 				.roles("USER");
-
 	}
 }

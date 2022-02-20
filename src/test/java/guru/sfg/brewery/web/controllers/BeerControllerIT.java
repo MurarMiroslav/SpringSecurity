@@ -4,9 +4,9 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import guru.sfg.brewery.repositories.BeerInventoryRepository;
@@ -17,8 +17,6 @@ import guru.sfg.brewery.services.BreweryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -94,14 +92,15 @@ public class BeerControllerIT {
 
 	@Nested
 	class BeerRestControllerTest {
+
 		@Test
-		void findBeers() throws Exception{
+		void findBeers() throws Exception {
 			mockMvc.perform(get("/api/v1/beer/"))
 					.andExpect(status().isOk());
 		}
 
 		@Test
-		void findBeerById() throws Exception{
+		void findBeerById() throws Exception {
 			mockMvc.perform(get("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c152"))
 					.andExpect(status().isOk());
 		}
@@ -110,7 +109,7 @@ public class BeerControllerIT {
 		void deleteBeer() throws Exception {
 			mockMvc.perform(delete("/api/v1/beer/97df0c39-90c4-4ae0-b663-453e8e19c311")
 							.header("Api-Key", "miro").header("Api-Secret", "murar"))
-					.andExpect(status().isOk());
+					.andExpect(status().is2xxSuccessful());
 		}
 	}
 
