@@ -1,17 +1,13 @@
 package guru.sfg.brewery.domain.security;
 
-import java.util.Set;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
+import javax.persistence.*;
+import java.util.Set;
+
+/**
+ * Created by jt on 6/21/20.
+ */
 @Setter
 @Getter
 @AllArgsConstructor
@@ -20,12 +16,12 @@ import lombok.Setter;
 @Entity
 public class Authority {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.AUTO)
-	private Integer id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Integer id;
 
-	private String role;
+    private String role;
 
-	@ManyToMany(mappedBy = "authorities")
-	private Set<User> users;
+    @ManyToMany(mappedBy = "authorities")
+    private Set<User> users;
 }
