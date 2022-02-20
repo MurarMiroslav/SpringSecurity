@@ -1,5 +1,6 @@
 package guru.sfg.brewery.config;
 
+import guru.sfg.brewery.security.SfgPasswordEncoderFactories;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -10,6 +11,8 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.password.NoOpPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
 @Configuration
@@ -31,34 +34,39 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 				.httpBasic();
 	}
 
+	@Bean
+	PasswordEncoder sfgPasswordEncoderFactories() {
+		return SfgPasswordEncoderFactories.createDelegatingPasswordEncoder();
+	}
+
 	@Override
 	protected void configure(AuthenticationManagerBuilder authenticationManagerBuilder) throws Exception {
 		authenticationManagerBuilder.inMemoryAuthentication()
 				.withUser("miro")
-				.password("{noop}murar")
+				.password("{bcrypt}$2a$10$.1gHLDljtHAjRkA81HTo0.bn1wkp3GDSpq7jfJmmQPqVyhNtRCISq")
 				.roles("ADMIN")
 				.and()
 				.withUser("michal")
 				.password("{noop}kurbel")
+//				.password("{sha256}3fc951541d0d2e460b9a2f4df43a33b4e2c9a1bc4795c3cdfb1b1dbc1a47facd")  //nechapem preco nefunguje mozno preto ze to je deprecated
 				.roles("USER");
-
 	}
 
-	@Override
-	@Bean
-	protected UserDetailsService userDetailsService() {
-
-		UserDetails miro = User.withDefaultPasswordEncoder()
-				.username("miro")
-				.password("murar")
-				.roles("ADMIN")
-				.build();
-		UserDetails michal = User.withDefaultPasswordEncoder()
-				.username("michal")
-				.password("kurbel")
-				.roles("USER")
-				.build();
-
-		return new InMemoryUserDetailsManager(miro, michal);
-	}
+//	@Override
+//	@Bean
+//	protected UserDetailsService userDetailsService() {
+//
+//		UserDetails miro = User.withDefaultPasswordEncoder()
+//				.username("miro")
+//				.password("murar")
+//				.roles("ADMIN")
+//				.build();
+//		UserDetails michal = User.withDefaultPasswordEncoder()
+//				.username("michal")
+//				.password("kurbel")
+//				.roles("USER")
+//				.build();
+//
+//		return new InMemoryUserDetailsManager(miro, michal);
+//	}
 }
