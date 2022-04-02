@@ -19,10 +19,8 @@ package guru.sfg.brewery.web.controllers;
 
 import guru.sfg.brewery.domain.Customer;
 import guru.sfg.brewery.repositories.CustomerRepository;
-import guru.sfg.brewery.security.perms.CustomerCreatePermission;
-import guru.sfg.brewery.security.perms.CustomerReadPermission;
-import guru.sfg.brewery.security.perms.CustomerUpdatePermission;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -44,16 +42,15 @@ public class CustomerController {
     //ToDO: Add service
     private final CustomerRepository customerRepository;
 
-    @CustomerReadPermission
     @RequestMapping("/find")
-    public String findCustomers(Model model) {
+    public String findCustomers(Model model){
         model.addAttribute("customer", Customer.builder().build());
         return "customers/findCustomers";
     }
 
-    @CustomerReadPermission
+    @PreAuthorize("hasAnyRole('ADMIN', 'CUSTOMER')")
     @GetMapping
-    public String processFindFormReturnMany(Customer customer, BindingResult result, Model model) {
+    public String processFindFormReturnMany(Customer customer, BindingResult result, Model model){
         // find customers by name
         //ToDO: Add Service
         List<Customer> customers = customerRepository.findAllByCustomerNameLike("%" + customer.getCustomerName() + "%");
@@ -72,8 +69,7 @@ public class CustomerController {
         }
     }
 
-    @CustomerReadPermission
-    @GetMapping("/{customerId}")
+   @GetMapping("/{customerId}")
     public ModelAndView showCustomer(@PathVariable UUID customerId) {
         ModelAndView mav = new ModelAndView("customers/customerDetails");
         //ToDO: Add Service
@@ -81,14 +77,13 @@ public class CustomerController {
         return mav;
     }
 
-    @CustomerCreatePermission
     @GetMapping("/new")
     public String initCreationForm(Model model) {
         model.addAttribute("customer", Customer.builder().build());
         return "customers/createCustomer";
     }
 
-    @CustomerCreatePermission
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/new")
     public String processCreationForm(Customer customer) {
         //ToDO: Add Service
@@ -96,26 +91,24 @@ public class CustomerController {
                 .customerName(customer.getCustomerName())
                 .build();
 
-        Customer savedCustomer = customerRepository.save(newCustomer);
+        Customer savedCustomer= customerRepository.save(newCustomer);
         return "redirect:/customers/" + savedCustomer.getId();
     }
 
-    @CustomerUpdatePermission
     @GetMapping("/{customerId}/edit")
-    public String initUpdateCustomerForm(@PathVariable UUID customerId, Model model) {
-        if (customerRepository.findById(customerId).isPresent())
-            model.addAttribute("customer", customerRepository.findById(customerId).get());
-        return "customers/createOrUpdateCustomer";
-    }
+   public String initUpdateCustomerForm(@PathVariable UUID customerId, Model model) {
+       if(customerRepository.findById(customerId).isPresent())
+          model.addAttribute("customer", customerRepository.findById(customerId).get());
+       return "customers/createOrUpdateCustomer";
+   }
 
-    @CustomerUpdatePermission
     @PostMapping("/{beerId}/edit")
     public String processUpdationForm(@Valid Customer customer, BindingResult result) {
         if (result.hasErrors()) {
             return "beers/createOrUpdateCustomer";
         } else {
             //ToDO: Add Service
-            Customer savedCustomer = customerRepository.save(customer);
+            Customer savedCustomer =  customerRepository.save(customer);
             return "redirect:/customers/" + savedCustomer.getId();
         }
     }
