@@ -119,6 +119,7 @@ public class DefaultBreweryLoader implements CommandLineRunner {
                     .beer(pinball)
                     .quantityOnHand(500)
                     .build());
+
         }
     }
 }
