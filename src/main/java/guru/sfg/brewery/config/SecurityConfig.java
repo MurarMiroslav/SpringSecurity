@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.data.repository.query.SecurityEvaluationContextExtension;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 /**
@@ -22,58 +23,64 @@ import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
-    private final UserDetailsService userDetailsService;
+	private final UserDetailsService userDetailsService;
+	private final PersistentTokenRepository persistentTokenRepository;
 
-    // needed for use with Spring Data JPA SPeL
-    @Bean
-    public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
-        return new SecurityEvaluationContextExtension();
-    }
+	// needed for use with Spring Data JPA SPeL
+	@Bean
+	public SecurityEvaluationContextExtension securityEvaluationContextExtension() {
+		return new SecurityEvaluationContextExtension();
+	}
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+	@Override
+	protected void configure(HttpSecurity http) throws Exception {
 
-                http
-                .authorizeRequests(authorize -> {
-                    authorize
-                            .antMatchers("/h2-console/**").permitAll() //do not use in production!
-                            .antMatchers("/", "/webjars/**", "/login", "/resources/**").permitAll();
-                } )
-                .authorizeRequests()
-                .anyRequest().authenticated()
-                .and()
-                .formLogin(loginConfigurer -> {
-                    loginConfigurer
-                            .loginProcessingUrl("/login")
-                            .loginPage("/").permitAll()
-                            .successForwardUrl("/")
-                            .defaultSuccessUrl("/")
-                            .failureUrl("/?error");
-                })
-                 .logout(logoutConfigurer -> {
-                     logoutConfigurer
-                             .logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
-                             .logoutSuccessUrl("/?logout")
-                             .permitAll();
-                 })
-                .httpBasic()
-                .and().csrf().ignoringAntMatchers("/h2-console/**", "/api/**")
-                .and().rememberMe()
-                        .key("sfg-key")
-                        .userDetailsService(userDetailsService);
+		http
+				.authorizeRequests(authorize -> {
+					authorize
+							.antMatchers("/h2-console/**").permitAll() //do not use in production!
+							.antMatchers("/", "/webjars/**", "/login", "/resources/**").permitAll();
+				})
+				.authorizeRequests()
+				.anyRequest().authenticated()
+				.and()
+				.formLogin(loginConfigurer -> {
+					loginConfigurer
+							.loginProcessingUrl("/login")
+							.loginPage("/").permitAll()
+							.successForwardUrl("/")
+							.defaultSuccessUrl("/")
+							.failureUrl("/?error");
+				})
+				.logout(logoutConfigurer -> {
+					logoutConfigurer
+							.logoutRequestMatcher(new AntPathRequestMatcher("/logout", "GET"))
+							.logoutSuccessUrl("/?logout")
+							.permitAll();
+				})
+				.httpBasic()
+				.and().csrf().ignoringAntMatchers("/h2-console/**", "/api/**")
+				.and()
+				    .rememberMe()
+				    .tokenRepository(persistentTokenRepository)
+				.userDetailsService(userDetailsService);
 
-                //h2 console config
-                http.headers().frameOptions().sameOrigin();
-    }
+//                        .rememberMe()
+//                        .key("sfg-key")
+//                        .userDetailsService(userDetailsService);
 
-    @Bean
-    PasswordEncoder passwordEncoder(){
-        return SfgPasswordEncoderFactories.createDelegatingPasswordEncoder();
-    }
+		//h2 console config
+		http.headers().frameOptions().sameOrigin();
+	}
 
-   // @Override
- //   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-       // auth.userDetailsService(this.jpaUserDetailsService).passwordEncoder(passwordEncoder());
+	@Bean
+	PasswordEncoder passwordEncoder() {
+		return SfgPasswordEncoderFactories.createDelegatingPasswordEncoder();
+	}
+
+	// @Override
+	//   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
+	// auth.userDetailsService(this.jpaUserDetailsService).passwordEncoder(passwordEncoder());
 
 //        auth.inMemoryAuthentication()
 //                .withUser("spring")
@@ -85,9 +92,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                .roles("USER");
 //
 //        auth.inMemoryAuthentication().withUser("scott").password("{bcrypt15}$2a$15$baOmQtw8UqWZRDQhMFPFj.xhkkWveCTQHe4OBdr8yw8QshejiSbI6").roles("CUSTOMER");
-  //  }
+	//  }
 
-    //    @Override
+	//    @Override
 //    @Bean
 //    protected UserDetailsService userDetailsService() {
 //        UserDetails admin = User.withDefaultPasswordEncoder()
@@ -104,19 +111,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //
 //        return new InMemoryUserDetailsManager(admin, user);
 //    }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 }
