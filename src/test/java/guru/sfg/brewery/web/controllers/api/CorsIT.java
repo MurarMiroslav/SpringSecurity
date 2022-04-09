@@ -19,7 +19,7 @@ public class CorsIT extends BaseIT {
     @Test
     void findBeersAUTH() throws Exception {
         mockMvc.perform(get("/api/v1/beer/")
-                .header("Origin", "https://springframework.guru"))
+                        .header("Origin", "https://springframework.guru"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Access-Control-Allow-Origin", "*"));
     }
@@ -27,8 +27,8 @@ public class CorsIT extends BaseIT {
     @Test
     void findBeersPREFLIGHT() throws Exception {
         mockMvc.perform(options("/api/v1/beer/")
-                .header("Origin", "https://springframework.guru")
-                .header("Access-Control-Request-Method", "GET"))
+                        .header("Origin", "https://springframework.guru")
+                        .header("Access-Control-Request-Method", "GET"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Access-Control-Allow-Origin", "*"));
     }
@@ -36,8 +36,8 @@ public class CorsIT extends BaseIT {
     @Test
     void postBeersPREFLIGHT() throws Exception {
         mockMvc.perform(options("/api/v1/beer/")
-                .header("Origin", "https://springframework.guru")
-                .header("Access-Control-Request-Method", "POST"))
+                        .header("Origin", "https://springframework.guru")
+                        .header("Access-Control-Request-Method", "POST"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Access-Control-Allow-Origin", "*"));
     }
@@ -45,8 +45,8 @@ public class CorsIT extends BaseIT {
     @Test
     void putBeersPREFLIGHT() throws Exception {
         mockMvc.perform(options("/api/v1/beer/1234")
-                .header("Origin", "https://springframework.guru")
-                .header("Access-Control-Request-Method", "PUT"))
+                        .header("Origin", "https://springframework.guru")
+                        .header("Access-Control-Request-Method", "PUT"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Access-Control-Allow-Origin", "*"));
     }
@@ -54,8 +54,8 @@ public class CorsIT extends BaseIT {
     @Test
     void deleteBeersPREFLIGHT() throws Exception {
         mockMvc.perform(options("/api/v1/beer/1234")
-                .header("Origin", "https://springframework.guru")
-                .header("Access-Control-Request-Method", "DELETE"))
+                        .header("Origin", "https://springframework.guru")
+                        .header("Access-Control-Request-Method", "DELETE"))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Access-Control-Allow-Origin", "*"));
     }

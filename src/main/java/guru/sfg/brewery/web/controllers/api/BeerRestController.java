@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+//@CrossOrigin //Ano je to mozne mat aj na vsetky tieto endpointy ako globalnu annotaciu
 @Slf4j
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/")
@@ -53,10 +54,10 @@ public class BeerRestController {
     @BeerReadPermission
     @GetMapping(produces = { "application/json" }, path = "beer")
     public ResponseEntity<BeerPagedList> listBeers(@RequestParam(value = "pageNumber", required = false) Integer pageNumber,
-                                                   @RequestParam(value = "pageSize", required = false) Integer pageSize,
-                                                   @RequestParam(value = "beerName", required = false) String beerName,
-                                                   @RequestParam(value = "beerStyle", required = false) BeerStyleEnum beerStyle,
-                                                   @RequestParam(value = "showInventoryOnHand", required = false) Boolean showInventoryOnHand){
+            @RequestParam(value = "pageSize", required = false) Integer pageSize,
+            @RequestParam(value = "beerName", required = false) String beerName,
+            @RequestParam(value = "beerStyle", required = false) BeerStyleEnum beerStyle,
+            @RequestParam(value = "showInventoryOnHand", required = false) Boolean showInventoryOnHand){
 
         log.debug("Listing Beers");
 
@@ -80,7 +81,7 @@ public class BeerRestController {
     @BeerReadPermission
     @GetMapping(path = {"beer/{beerId}"}, produces = { "application/json" })
     public ResponseEntity<BeerDto> getBeerById(@PathVariable("beerId") UUID beerId,
-                                               @RequestParam(value = "showInventoryOnHand", required = false) Boolean showInventoryOnHand){
+            @RequestParam(value = "showInventoryOnHand", required = false) Boolean showInventoryOnHand){
 
         log.debug("Get Request for BeerId: " + beerId);
 
@@ -120,6 +121,7 @@ public class BeerRestController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @CrossOrigin
     @BeerDeletePermission
     @DeleteMapping({"beer/{beerId}"})
     @ResponseStatus(HttpStatus.NO_CONTENT)
